@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <style type="text/css">
+        div{
+            position: absolute;
+            height: 100px;
+            width: 100px;
+        }
+
+        #box1{
+            background: #2c5;
+
+        }
+        #box2{
+            background: #25c;
+
+        }
+    </style>
+</head>
+<body>
+    <div id="box1" style="position:absolute;top:50px;left:100px"></div>
+    <div id="box2" style="position:absolute;top:250px;left:900px"></div>
+</body>
+<script>
+    (function(){
+        var box1 = document.getElementById('box1');
+        var box2 = document.getElementById('box2');
+
+        var lastTime = Date.now();
+        var box1Speed = 100;
+        var box2Speed = 200;
+
+        function main(){
+            var now = Date.now();
+            var dt = (now - lastTime) / 1000.0;
+
+            var rectA = getDimensions(box1);
+            var rectB = getDimensions(box2);
+
+            var isCollide = collides(rectA,rectB);
+
+            if(isCollide){
+                alert(111);
+                return;
+            }else{
+                box1.style.left = parseInt(box1.style.left) + box1Speed * dt + 'px';
+                box2.style.left = parseInt(box2.style.left) - box2Speed * dt + 'px';
+            }
+
+            lastTime = now;
+
+           setTimeout(main,1000 / 60);
+        }
+
+
+        main();
+
+        function getDimensions(element){
+            return {
+                'x':element.offsetLeft,
+                'y':element.offsetTop,
+                'width':element.offsetWidth,
+                'height':element.offsetHeight
+            };
+        }
+
+        function collides(rectA,rectB){
+            return !(rectA.x + rectA.width < rectB.x ||
+                    rectB.x + rectB.width < rectA.x ||
+                    rectA.y + rectA.height < rectB.y ||
+                    rectB.y + rectB.height < rectA.y);
+        }
+    })();
+</script>
+</html>
