@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>javascript-Tween</title>
+	<style>
+		*{
+			padding: 0;
+			margin: 0;
+		}
+		h1{
+			border-top:5px dashed #000;
+			border-bottom:5px dashed #000;
+			padding: 5px;
+			font-size: 60px; 
+		}
+		h3{
+			margin-top: 30px;
+			padding: 10px;
+		}
+		span{
+			display: block;
+			font-size: 16px;
+			line-height: 1.5em;
+			margin: 10px;
+			padding: 5px;
+		}
+		img{
+			margin: 8px auto 0;
+		}
+		p{
+			padding: 10px;
+			margin: 5px;
+			font-size: 16px;
+			line-height: 1.5em;
+		}
+		span{
+			display: block;
+			font-size: 16px;
+			line-height: 1.5em;
+			margin: 10px;
+			padding: 5px;
+		}
+		/*代码样式*/
+		span.code{
+			padding: 10px;
+			margin: 10px;
+			font-size: 12px;
+			background: #eee;
+			border: 1px dashed #ccc;
+			clear: both;
+			zoom: 1;
+		}
+		/*区域样式*/
+		div.zone{
+			padding: 10px;
+			width: 600px;
+			border: 2px solid #a0b3d6;
+			margin:10px;
+		}
+		/*强调样式*/
+		span.emphasize{
+			display: inline;
+			border: 1px solid #EAEAEA;
+			background-color: #dddddd;
+			border-radius: 3px;
+			padding: 0 4px;
+			margin-left: 2px;
+			margin-right: 2px;
+			font-family: Consolas,monospace;
+		}
+		/*相框样式*/
+		div.photo-frame{
+			margin: 10px auto;
+			padding: 0 8px;
+			box-shadow: 0 2px 6px rgba(0,0,0,.4);
+			width: 400px;
+			height: 320px;
+			overflow: hidden;
+		}
+		div.zone .move-frame{
+			margin: 10px;
+			border: 1px solid #000000; 
+			width: 550px; 
+			position: relative; 
+			height: 50px;
+		}
+
+		div.zone .move-frame .move-box{
+			background: #993300 none repeat scroll 0% 0%; 
+			width: 50px; 
+			position: absolute; 
+			height: 50px;
+			left:0px;
+			
+		}
+		.btn{
+			margin: 10px;
+			padding: 5px 5px;
+			border: 1px solid #A0b3d6;
+		}
+
+		#carousel_example div.photo{
+			display: inline;
+			height: 300px;
+			width: 400px;
+			position: relative;
+			overflow: hidden;
+		}
+
+		#carousel_example div.photo div{
+			width: 2050px;
+			position: relative;
+			display: inline;
+			float:left;
+			overflow: hidden;
+			left: 0px;
+			
+		}
+		#carousel_example div.photo div img{
+			float: right;
+			margin-right: 10px;
+		}
+		
+
+
+
+		
+	</style>
+</head>
+<body>
+
+	<div>
+		<h1>动画简介</h1>
+		<p>当我们玩游戏的时候，会查看游戏的帧数，帧数很小的时候就会很卡，帧数高就会流畅，所谓帧数就是一秒钟显示图片的数量，当很多张图片连起来就形成了动画，同理，动画片也就这么形成的</p>
+		<p>Js中实现动画都是靠setInterval或者setTimeout来实现。setInterval自身就能不断循环来执行计算从而显示新的帧，setTimeout是间隔一段时间后仅执行一次，他需要配合函数循环实现。</p>
+		<p>下面看一下js里面一个简单的动画效果是什么意思，比如我们就实现一个区域块的移动动画效果,看一下有动画和无动画的区别</p>
+
+		<div class="zone" id="diff_example">
+			<div style="" class="move-frame">
+				<div style="" id="idMoveStatic" class="move-box">
+				</div>
+			</div>
+			<input type="button" value="点击移动" class="btn">
+
+			<div style="" class="move-frame">
+				<div style="" id="idMoveAnimation" class="move-box">
+				</div>
+			</div>
+			<input type="button" value="点击移动" class="btn">
+		</div>
+
+		<p>很明显，第一个是没有动画的，直接把方块通过js移动指定位置，而第二个则是通过动画慢慢的移动过去</p>
+		<p>要搞清楚这个原理，首先来做一道小学应用题：</p>
+		<span class="code">小明的家距离学校有500米，那么家为起点，我们设为initPos=0，学校为终点，设为targetPos=500。这500米的距离小明骑车去学校一共要蹬100下，设为count=100，那么小明蹬第20下的时候，设为currentCount=20,小明走了多远?</span>
+		<p>要接这道题是不是很简单,直接上公式:</p>
+		<span class="code">(targetPos - initPos) * currentCount / count </span>
+		<p>其实这个就是初中物理学习的牛顿第一定律-匀速直线运动</p>
+		<span class="code">s = v*t; s为位移，v为速度且为恒矢量，t为发生位移s所用的时间</span>
+		<p>上面这个题 <span class="emphasize">v = (targetPos - initPos)/count,t = currentCount</span>,得出结果100</p>
+		<p>如果题目再改一下，小明已经蹬了20下,求小明再蹬40下之后的距离，这个题无非就是把之前蹬的20下的距离再加上就行了</p>
+		<p>通过这个题，我们还能把上面的例子再改一下,实现一个暂停后再继续的效果</p>
+		
+		<div class="zone" id="stop_example">
+
+			<div style="" class="move-frame">
+				<div style="" id="idMoveStopAnimation" class="move-box">
+				</div>
+			</div>
+			<input type="button" value="点击移动" class="btn">
+			<input type="button" value="点击暂停" class="btn">
+		</div>
+
+		<p>通过上面的列子，可以看出，当运动暂停时，小方块的位置发生的变化，点重现点击开始的时候，开始的位置应该重新赋值，即上一次停止的位置initPos = temX,但是需要注意的是重新开始后，由于距离发生了变化，但是速率V应该保持不变，因此需要重新定位总共执行的步骤，即count。</p>
+		<p>下面通过一个常见的轮播例子来看看js动画</p>
+
+		<div class="zone" id="carousel_example">
+			<div class="photo-frame">
+				<div class="photo">
+					<div id="photoContent">
+						<img src="images/one_piece_1.jpg" alt="">
+						<img src="images/one_piece_2.jpg" alt="">
+						<img src="images/one_piece_3.jpg" alt="">
+						<img src="images/one_piece_4.jpg" alt="">
+						<img src="images/one_piece_5.jpg" alt="">
+					</div>
+					
+				</div>
+				
+			</div>
+			<input type="button" value="下一张图片" class="btn" id="nextPic">
+		</div>
+
+		<p>上面看到的就是简单的匀速运动的算法，如果要做出简单的加速度的效果，需要运用到另外的计算公式</p>
+		<span class="code">
+			b = initPos, c = targetPos - initPos, t = currentCount, d = count;
+            当前距离 = c * (t /= d) * t + b;
+		</span>
+		<p>道理其实很简单，随着t的变化越来越接近d,那么(t/=d)的值就越来越接近1，速度也就越来越快，其实这和抛物线公式y=ax²很类似，当然更加具体的说这其实就是贝塞尔曲线(Bézier curve)的线性公式，基本上计算机里面所有涉及到画线的东西，都需要依靠贝塞尔公式，比如photoshop里的直线、喷枪、画笔工具，具体的贝塞尔曲线线性公式如下:</p>
+		
+		<span class="code">
+			给定点P0、P1，线性贝塞尔曲线只是一条两点之间的直线。这条线由下式给出：
+				<div style="text-align: center;"><img src="images/Bézier_curve_1.jpg" alt=""></div>
+				<div class="photo-frame" style="height:170px;width:360px;"><img src="images/Bézier_curve_2.gif" alt=""></div>
+		</span>
+
+		<p>我们在运用的时候直接套用这个公式其实就ok,其他基本不用变化，来看一下列子</p>
+
+		<div class="zone" id="accelerated_example" >
+			
+			<div class="move-frame">
+				<div style="" id="idAccelerateInAnimation" class="move-box">
+				</div>
+			</div>
+			<input type="button" value="点击移动" class="btn">
+
+			<div class="move-frame">
+				<div style="" id="idAccelerateOutAnimation" class="move-box">
+				</div>
+			</div>
+			<input type="button" value="点击移动" class="btn">
+		</div>
+		
+
+
+	</div>
+</body>
+<script type="text/javascript">
+
+	/**
+	 * [第一段演示代码]
+	 */
+	(function(){
+		var timer = 10;
+		var btns = getElementsByClassName($('diff_example'),'input','btn');
+		
+		addEvent(btns[0],'click',function(){
+			var idMove = $('idMoveStatic');
+			idMove.style.left = "500px";
+		});
+
+		addEvent(btns[1],'click',function(){
+			var idMove = $('idMoveAnimation');
+			/*
+	        	currentCount 当前执行次数
+	        	initPos 初始值
+	        	targetPos - initPos 发生偏移的距离值
+	        	count 一共执行次数
+        	*/
+			var initPos = 0, targetPos=500, c = targetPos - initPos, currentCount=0, count=100;
+            var tempX = 0
+            var flag = setInterval(function(){
+            	if(currentCount > count){
+            		clearInterval(flag);
+            	}
+            	else{
+            		currentCount ++;
+            		tempX = c * currentCount / count + initPos;
+            		idMove.style.left = tempX + "px";
+            		if (tempX > targetPos ) {
+                        idMove.style.left = targetPos + "px";
+                    }
+            	}
+            }, 50);
+		});
+	})();
+
+	/**
+	 * [第二段演示代码]
+	 * @return {[type]} [description]
+	 */
+	(function(){
+
+		var timer = 50;
+		var btns = getElementsByClassName($('stop_example'),'input','btn');
+		var initPos = 0, targetPos=500, c = targetPos - initPos, currentCount=0, count=100;
+		var idMoveStop = $('idMoveStopAnimation');
+		var tempX = 0;
+
+		addEvent(btns[0],'click',function(){
+            tempCount = move(idMoveStop,initPos,targetPos,currentCount,count);
+		});
+
+		addEvent(btns[1],'click',function(){
+            stop(idMoveStop);
+		});
+
+		function move(obj,initPos,targetPos,currentCount,count){
+			
+			clearInterval(obj.t);
+			currentCount = 0;
+			obj.t = setInterval(function(){
+            	if(currentCount > count){
+            		clearInterval(obj.t);
+            	}
+            	else{
+            		currentCount ++;
+            		tempX = (targetPos - initPos) * currentCount / count + initPos;
+            		obj.style.left = tempX + "px";
+            		if (tempX > targetPos ) {
+                        obj.style.left = targetPos + "px";
+                    }
+                    //这里把currentCount变量保存在对象obj的属性里面是为了方便传递值，不然不好传递值
+                    obj.c = currentCount;
+            	}
+            }, timer);
+
+		}
+
+		function stop(obj){
+			clearInterval(obj.t);
+			//由于距离变化了，为了保持匀速运动的V不变，所以需要从新定位
+			initPos = tempX;
+			count = count - obj.c;
+		}
+
+	})();
+
+	/**
+	 * [第三段演示代码]
+	 */
+	(function(){
+		var nextPic = $('nextPic');
+		var num = 0;
+		addEvent(nextPic,'click',function(){
+			if(num == 5) num = 0;
+			var photots = $('photoContent');
+			var initPos = 0,targetPos=410,currentCount=0,count=100;
+			
+			var flag = setInterval(function(){
+				if(currentCount > count){
+					clearInterval(flag);
+				}else{
+					currentCount ++;
+					var tempX = (targetPos - initPos) * currentCount / count + initPos;
+
+					photots.style.left = "-" + (tempX + targetPos * (num-1)) + "px";
+					if (tempX > targetPos ) {
+                        photots.style.left = "-" + targetPos * num + "px";
+                    }
+				}
+			}, 10);
+
+			num++;
+		});
+	})();
+
+	/**
+	 * [第四段演示代码]
+	 */
+	(function(){
+		var btns = getElementsByClassName($('accelerated_example'),'input','btn');
+		//加速
+		addEvent(btns[0],'click',function(){
+			var idMove = $('idAccelerateInAnimation');
+			
+			var initPos = 0, targetPos=500, currentCount=0, count=100;
+            var tempX = 0
+            var flag = setInterval(function(){
+            	if(currentCount > count){
+            		clearInterval(flag);
+            	}
+            	else{
+            		currentCount ++;
+            		tempX = QuadraticEaseIn(initPos, targetPos, currentCount, count);
+            		
+            		
+            		if (tempX >= targetPos ) {
+                        idMove.style.left = targetPos + "px";
+                    }else{
+                    	idMove.style.left = tempX + "px";
+                    }
+            	}
+            }, 50);
+
+		});
+
+		    //减速
+		addEvent(btns[1], 'click', function() {
+				var idMove = $('idAccelerateOutAnimation');
+
+				var initPos = 0,
+					targetPos = 500,
+					currentCount = 0,
+					count = 100;
+				var tempX = 0
+				var flag = setInterval(function() {
+					if (currentCount > count) {
+						clearInterval(flag);
+					} else {
+						currentCount++;
+						tempX = QuadraticEaseOut(initPos, targetPos, currentCount, count);
+
+
+						if (tempX >= targetPos) {
+							idMove.style.left = targetPos + "px";
+						} else {
+							idMove.style.left = tempX + "px";
+						}
+					}
+				}, 50);
+		});
+
+		function QuadraticEaseIn(initPos, targetPos, currentCount, count){
+			var b = initPos, c = targetPos - initPos, t = currentCount, d = count;
+            return c * (t /= d) * t + b;
+		}
+
+		function QuadraticEaseOut(initPos, targetPos, currentCount, count){
+			var b = initPos, c = targetPos - initPos, t = currentCount, d = count;
+			//贝塞尔曲线，t取值[0,1],如果是正值，那么速度就会越快，如果是负值速度就越慢
+			//这里t-2就是为了取得负值，那为啥要t-2,不是t-1?t-2会让慢慢变化，最终接近-1，
+			//而t-1最后会变成0，会造成什么效果，可以改一下看一下效果
+            return -c * (t /= d) * (t-2) + b;
+		}
+
+	})();
+
+
+//====================================需要用到的函数=======================================================//
+	function $(id){
+		return document.getElementById(id);
+	}
+
+	function getElementsByClassName(parent,tagName,className){
+		if("string" == typeof parent) return $(parent);
+		var tags = parent.getElementsByTagName(tagName);
+		var arr = [];
+		for (var i = 0,len = tags.length; i < len; i++) {
+			if(tags[i].className.indexOf(className) != -1){
+				arr.push(tags[i]);
+			}
+		};
+		return arr;
+	}
+
+	function addEvent(node,type,listener){
+
+		if(node.addEventListener){
+			node.addEventListener(type, listener, false);
+			return true;
+		}
+		else if(node.attachEvent){
+			node['e'+type+listener] = listener;
+
+			node[type+listener] = function(){
+				node['e'+type+listener](window.event);
+			};
+
+			node.attachEvent('on'+type,node[type+listener]);
+			return true;
+		}
+
+		return false;
+	}
+
+	function getCss(node,key){
+		return node.currentStyle ? node.currentStyle[key] : document.defaultView.getComputedStyle(node,null)[key];
+	}
+
+	/**
+	 * [getElementPos 获取元素节点在界面上(document)的位置]
+	 * @param  {[Object]} el [元素节点]
+	 * @return {[Object]}    [节点的left和height]
+	 */
+	function getElementPos(el) {
+		
+		var _x = 0,
+			_y = 0;
+		do {
+			_x += el.offsetLeft;
+			_y += el.offsetTop;
+		} while (el = el.offsetParent);
+		return {
+			x: _x,
+			y: _y
+		};
+	}
+
+	
+</script>
+</html>
